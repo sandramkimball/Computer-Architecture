@@ -3,15 +3,15 @@
 import sys
 
 class CPU:
-    """Main CPU class."""
-
     def __init__(self):
-        """Construct a new CPU."""
-        pass
+        memory = [0] * 256
+        register = [0] * 8 
+        pc = 0
+        running = True
 
     def load(self):
         """Load a program into memory."""
-
+        
         address = 0
 
         # For now, we've just hardcoded a program:
@@ -29,7 +29,6 @@ class CPU:
         for instruction in program:
             self.ram[address] = instruction
             address += 1
-
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -60,6 +59,37 @@ class CPU:
 
         print()
 
+    # MAR: Memory Address Register
+    # MDR: Memory Data Register
+    def ram_read(MAR):
+        target = MAR[pc + 1]
+        pc += 2
+        return target
+
+    def ram_write(MDR, MAR): 
+        reg_a = MAR[pc + 1]
+        reg_b = MAR[pc + 2]
+        register[reg_a] += register[reg_b]
+        # register[reg_a] += MDR ??
+        pc += 3
+
     def run(self):
-        """Run the CPU."""
-        pass
+        # read address in pc
+        # store result in IR (Instruction Register)
+        if command == LDI:
+            # load immediate
+            # store val in rgstr
+            # set register to:
+            # not always a num
+
+        elif command ==  PRN:
+            # pseudo-instruction, 
+            # prints num value in rgstr
+
+        elif command ==  HLT:
+            running = False
+            sys.exit(1)
+
+LDI = 1 
+PRN = 2 
+HLT = 3 
