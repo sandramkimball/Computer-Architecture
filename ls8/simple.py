@@ -25,6 +25,7 @@ memory = [
     HALT
 ] # needs a pointer; use a program counter(pc):
 
+memory = [None] * 256
 register = [0] * 8 # xtrmly fast, small data grps (ie a word) baked into hardware, NOT MEMORY 
 cache #lil slower than yet bigger than rgstr
 pc = 0 
@@ -66,3 +67,37 @@ while running: #this is the processor
         sys.exit(1)
 
     pc += 1
+
+
+    # ########
+
+
+
+filename = sys.argv[1]
+
+def load_memory(filename):
+    address = 0
+
+    if len(sys.argv) != 2:
+        print('usage: file.py filename')
+        sys.exit(1)
+    
+    try: 
+        with open(filename) as f:
+            for line in f:
+                # want to ignore comments
+                comment_split = line.split('#')
+                # stip out whitespace
+                num = comment.split[0].strip()
+                # ignore blank lines
+                if num == '':
+                    continue
+                print(line)
+
+                val = int(num)
+                memory[address] = val
+                address += 1
+                
+    except FileNotFoundError:
+        print('File not found')
+        sys.exit(2)

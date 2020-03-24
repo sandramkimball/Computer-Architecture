@@ -142,7 +142,7 @@ whatever we are doing, wherever we are.
 
 This instruction sets a specified register to a specified value.
 
-See the LS-8 spec for the details of what this instructions does and its opcode
+See the LS-8 spec for the details of what this instruction does and its opcode
 value.
 
 ## Step 6: Add the `PRN` instruction
