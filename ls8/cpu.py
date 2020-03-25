@@ -2,9 +2,12 @@
 
 import sys
 
-LDI = 1 
-PRN = 2 
-HLT = 3 
+LDI  = 1 
+PRN  = 2 
+HLT  = 3 
+MUL  = 4
+# PUSH = 4
+# POP  = 5
 
 class CPU:
     def __init__(self):
@@ -12,8 +15,13 @@ class CPU:
         self.reg = [0] * 8 
         self.pc = 0
         self.running = True
+        self.SP = 7 # stndrd 8th register?? F4??
+        self.branchtable = {}
+        self.branchtable[OP1] = self.fhandle_op1
+        self.branchtable[OP2] = self.fhandle_op2
         # self.fl = 
         # self.ie = 
+        # self.op = 
 
     def load(self, filename):
         """Load a program into memory."""
@@ -49,7 +57,16 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
+
+        elif op == "SUB":
+            self.reg[reg_a] -= self.reg[reg_b]
+
+        elif op == "MUL":
+            self.reg[reg_a] *= self.reg[reg_b]
+
+        elif op == "DIV":
+            self.reg[reg_a] /= self.reg[reg_b]
+
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -81,10 +98,40 @@ class CPU:
         self.ram[MAR] = MDR
         # self.pc += 3
 
+    def stack(self, n): 
+        # starts at top address
+        # vals stored in allocated ram portion
+        # update SP
+        if n <= 1:
+            return 1
+        return n * factorial(n-1)
+
+    def handle_op1(self, a):
+        print('op 1: ' + a)
+
+    def handle_opb(self, b):
+        print('op 2: ' + b)
+
+    def pop(self):
+        reg = memory[pc + 1]
+        val = register[reg]
+        # copy val from address to memory
+        regiter[reg] = val
+        pc += 0
+
+    def push(self):
+        reg = memory[pc + 1]
+        val = register[reg]
+        # decrement SP
+        register[SP] = (register[SP] - 1) % (len(memory))
+        # copy val from stack
+        memory[register[SP]] = valpc += 2
+
     def run(self):
+        # if/elif = O(n) || if not, O(1)
         # read address in pc
         # store result in IR (Instruction Register)
-        if command == LDI:
+        if command == LDI: 
             # load immediate
             # store val in rgstr
             # set register to:
@@ -103,5 +150,10 @@ class CPU:
             running = False
             sys.exit(1)
 
-Multiply = cpu.load(mult.ls8)
-Multiply.run()
+        ir = OP1
+        self.branchtable[ir]('foo')
+        
+        ir = OP2
+        self.branchtable[ir]('bar')
+
+    

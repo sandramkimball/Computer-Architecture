@@ -250,10 +250,11 @@ to better modularize your code? There are plenty of them!
 > values. This is `O(n)`. It would be a lot better if it we an `O(1)` process...
 
 One option is to use something called a _branch table_ or _dispatch table_ to
-simplify the instruction handler dispatch code. This is a list or dictionary of
-functions that you can index by opcode value. The upshot is that you fetch the
-instruction value from RAM, then use that value to look up the handler function
-in the branch table. Then call it.
+simplify the instruction handler dispatch code. 
+- Is a list, dictionary of funcs you can index by opcode val. 
+- Fetch the instruction val from RAM.
+- Use val to look up handler func in the branch table. 
+- Call handler func
 
 Example of a branch table:
 
