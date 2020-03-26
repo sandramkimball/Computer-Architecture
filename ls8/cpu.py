@@ -2,37 +2,37 @@
 
 import sys
 
-LDI  = 1 
-PRN  = 2 
-HLT  = 3 
-PUSH = 4
-POP  = 5
-CALL = 6
-RET  = 7
-INT  = 8
-IRET = 9   
-MUL  = 10
+HLT = 0b00000001
+LDI = 0b10000010
+PRN = 0b01000111
+MUL = 0b10100010 
+PUSH = 0b01000101
+POP = 0b01000110
+CALL = 0b01010000
+RET  = 0b00010001
+LD   = 0b10000011
+ST   = 0b10000100
+PRA  = 0b01001000
+
 
 class CPU:
     def __init__(self):
         self.ram = [0] * 256
         self.reg = [0] * 8 
         self.pc = 0 # Program Counter
-        self.running = True # flag
-        self.FL = E # flag: L, G, E for CMP operands
-        self.SP = 7 # Stack Pointer F4??
-        self.IR = # Instruction Reg - copy of curr excting instr
-        self.MAR = # Memry Address Reg - holds address
-        self.MDR = # Memry Data Reg - holds value
-        self.branchtable = {}
-        self.branchtable[OP1] = self.fhandle_op1
-        self.branchtable[OP2] = self.fhandle_op2
-        # self.ie = 
-        # self.op = 
+        self.reg[SP] = 0xF3
+        self.SP = 0xF4 # Stack Pointer
+        # self.MAR = # Memry Address Reg - holds address
+        # self.MDR = # Memry Data Reg - holds value
+        # self.branchtable = {}
+        # self.branchtable[OP1] = self.fhandle_op1
+        # self.branchtable[OP2] = self.fhandle_op2
+        # self.FL = E # flag: L, G, E for CMP operands
 
-    def load(self, filename):
+    def load(self): 
         """Load a program into memory."""
         address = 0
+        filename = sys.argv[1]
 
         if len(sys.argv) != 2:
             print(f'usage: file.py {filename}')
@@ -97,11 +97,11 @@ class CPU:
 
     def ram_read(MAR):
         return self.ram[MAR]
-        self.pc += 2
+        # self.pc += 2
 
-    def ram_write(MDR, MAR): 
+    def ram_write(MAR, MDR): 
         self.ram[MAR] = MDR
-        self.pc += 3
+        # self.pc += 3
 
     def stack(self, n): 
         # starts at top address
@@ -110,13 +110,6 @@ class CPU:
         if n <= 1:
             return 1
         return n * factorial(n-1)
-
-    def handle_op1(self, a):
-        
-        print('op 1: ' + a)
-
-    def handle_opb(self, b):
-        print('op 2: ' + b)
 
     def pop(self):
         reg = memory[pc + 1]
@@ -137,84 +130,73 @@ class CPU:
 
     def run(self):
         # if/elif = O(n) || O(1)
-        # read address in pc
-        # store result in IR (Instruction Register)
-        if command == LDI: 
-            # load immediate
-            # store val in rgstr
-            # set register to, not always a num
-            address = register[pc + 1]
-            val = register[pc + 2]
-            self.ram_write(address)
-            pc += 2
+        # read address in pc, store result in IR (Instruction Register)
+        running = True
+        while running is True:
+            IR = self.ram_read(self.pc)
+            operand_a = self.ram_read(self.pc + 1) #address = register[pc + 1]
+            operand_b = self.ram_read(self.pc + 2)
 
-        elif command ==  PRN:
-            # prints num value in rgstr
-            address = register[pc + 1]
-            target = self.ram_read(address)
-            print(target)
-            pc += 2
+            # HLT
+            if IR == 0b00000001: 
+                running = False
+                self.pc += 1
 
-        elif command ==  HLT:
-            running = False
-            pc += 1
+            # LDI
+            elif IR == 0b10000010: 
+                # load immediate, store val in reg
+                self.reg[operand_a] = operand_b
+                self.pc += 3
 
-        elif commant == MUL:
-            self.alu(MUL, reg_a, reg_b)
-            # self.reg[reg_a] *= self.reg[reg_b]
+            # PRN
+            elif IR == 0b01000111:
+                # prints num value in rgstr
+                print(self.reg[operand_a])
+                self.pc += 2
+ 
+            # MUL
+            elif IR == 0b10100010:
+                self.alu(MUL, reg_a, reg_b)
+                # self.reg[reg_a] *= self.reg[reg_b]
 
-        elif command ==  CALL:
-            # decrement SP
-            register[SP] -= 1
-            memory[SP] = pc + 2
-            # store the instruction
-            reg = memory[pc + 1]
+            # PUSH
+            elif IR == 0b01000101:
+                # Copy val from address to given reg
+                # decrement SP
+                self.ram[self.SP] = self.reg[operand_a]
+                self.SP -= 1
+                self.pc += 2
 
-        elif command ==  RET:
-            # return 
-            pc = memory[register[SP]]
-            register[SP] += 1
+            # POP
+            elif IR == 0b01000110:
+                # copy val from address
+                # increment SP
+                self.reg[operand_a] = self.ram[self.SP]
+                self.SP += 1
+                self.pc += 2
 
-        elif command ==  INT:
-            # Interrupt - issues intrrpt num stored in given reg
-            # sets _n_th bit in IS reg to val in given reg
-            # int_num = reg[num]
-            # IS_reg[n] = int_num
-            # return int_num
+            # CALL
+            elif IR == 0b01010000:
+                # decrement SP
+                register[SP] -= 1
+                memory[SP] = pc + 2
+                # store the instruction
+                reg = memory[pc + 1]
 
-            # # IM register bitwise AND-ed with IS reg and result stored as:
-            # maskedInterrupts = []
-            # maskedInterrupts.push(IM_reg[bit])
-            # # check each bit, 0-7
-            # for range (0, len(maskedInterrupts)-1):
-            #     if bit is set:
-            #         #stop interrupts and clear bit from IS
-            #         IS_reg[bit] = IS_reg[bit + 1]
-            #         stack.push(PC)
-            #         stack.push(FL)
-            #         stack.push(IM_reg)
-            #         return bit
+            # RET
+            elif IR == 0b00010001:
+                # pop val from stack and return 
+                self.pc = memory[register[SP]]
+                register[SP] += 1
 
-        elif command ==  IRET:
-            # return from an interrupt handler
-            # regs R6-R0, then FL are poppd off stack
-            # reg = memoery[pc + 1]
-            # popped_reg = self.pop(stack[reg])
-            # popped_FL = self.pop(stack[FL])
-            # #  return addrss popped and stored in PC
-            # address = register[pc + 1]
-            # self.pop(stack[address])
-            # pc = register[address]
-            #  Interrpts are re-enbled
+            # ADD
+            elif IR == ADD:
+                # pop val from stack and store in PC
+                self.reg[operand_a] += self.reg[operands_b]
+                self.pc += 3
 
-        else:
-            print(f'Unknown command: {command}')
-            sys.exit(1)
+            else:
+                print(f'Unknown command: {command}')
+                sys.exit(1)
 
-        pc += 1
-
-ir = OP1
-self.branchtable[ir]('foo')
-
-ir = OP2
-self.branchtable[ir]('bar')
+# self.SP is register[SP]
