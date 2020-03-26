@@ -30,9 +30,3 @@
 
 - [ ] Implement the CALL and RET instructions
 - [ ] Implement Subroutine Calls and be able to run the `call.ls8` program
-
-### Stretch
-
-- [ ] Add the timer interrupt to the LS-8 emulator
-- [ ] Add the keyboard interrupt to the LS-8 emulator
-- [ ] Write an LS-8 assembly program to draw a curved histogram on the screen

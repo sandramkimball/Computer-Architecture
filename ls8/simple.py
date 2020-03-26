@@ -1,6 +1,5 @@
 import sys
 
-# ----- SIMPLE EXAMPLE -----
 PRINT_BEES      = 1
 HALT            = 2
 PRINT_NUM       = 3
@@ -9,8 +8,20 @@ PRINT_REGISTER  = 5
 ADD             = 6 
 PUSH            = 7
 POP             = 8
+CALL            = 9
+RET             = 10
 
-#then create memory to store this in:
+memory = [None] * 256
+register = [0] * 8 # xtrmly fast, small data grps(a word), NOT MEMORY 
+cache #lil slower yet bigger than rgstr
+filename = sys.argv[1]
+SP = 7 # R7 is reserved as SP
+pc = 0 # program counter that points to memory address
+running = True # just a flag 
+
+
+# PART 1
+# example hardcoded memory:
 memory = [
     PRINT_BEES,
     SAVE,
@@ -25,20 +36,14 @@ memory = [
     PRINT_REGISTER,
     2,
     HALT
-] # needs a pointer; use a program counter(pc):
+] 
 
-memory = [None] * 256
-register = [0] * 8 # xtrmly fast, small data grps (ie a word) baked into hardware, NOT MEMORY 
-cache #lil slower than yet bigger than rgstr
-
-SP = 7 # R7 is reserved as SP
-pc = 0 
-running = True #just a flag 
 
 while running: #this is the processor
     command = memory[pc]
-    print(memory)
-    print(register)
+    # print(memory)
+    # print(register)
+    print(pc)
     print('------')
 
     if command = PRINT_BEES:
@@ -89,6 +94,21 @@ while running: #this is the processor
        register[SP] += 1
        pc += 2
 
+    elif command == CALL:
+        # decrement SP
+        register[SP] -= 1
+        memory[register[SP]] = pc + 2 # 2=memory directly after call
+        # store the instruction
+        reg = memory[pc + 1] #where register is at, address pointed to
+        pc = register[reg]
+        # why not use PUSH? It's not a function you can call, its hardware
+
+
+    elif command == RET:
+        pc = memory[register[SP]]
+        register[SP] += 1
+        
+
     else: 
         print(f'Unknown command: {command}')
         sys.exit(1)
@@ -96,18 +116,26 @@ while running: #this is the processor
     pc += 1
 
 
-    #########
-
-
-
-filename = sys.argv[1]
-
-def factorial(n):
+# PART 2
+def factorial(n): # O(n)
     if n <= 1: # base case (without recursion, stack overflow happens)
         return 1
     return n * factorial(n-1) # pop it off the stack
-print factorial(5)
 
-# push - update pointer and memory
-# pop - update pointer and register
+def tailOptimizedFactorial(n):# O(1)
+    total = 1
+    for i in range(1, n + 1):
+        total += 1
+    return total
+    
+# print factorial(5)
+# print tailOptimizedFactorial(5)
 
+# STUDY:
+# conversions between binary, hex, decimal
+# bitwise ops, logical ops
+# whate are computer components? processor(cpu, alu), memory, registers, bus
+# what's an interupt?
+# what is a stack, how it works, what's used for?
+# what is the ls-8, how does it work, implement ops?
+# Can register set variables? Registers have limited space, so use a stack: vars stored at the top, "we don't need this var/cmmnd anymore", POP! POP! POP! POP!... and back to the return!
