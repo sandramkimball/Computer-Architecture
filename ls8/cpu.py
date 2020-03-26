@@ -20,8 +20,8 @@ class CPU:
         self.ram = [0] * 256
         self.reg = [0] * 8 
         self.pc = 0 # Program Counter
-        self.reg[SP] = 0xF3
         self.SP = 0xF4 # Stack Pointer
+        # self.reg[self.SP] = 0xF3
         # self.MAR = # Memry Address Reg - holds address
         # self.MDR = # Memry Data Reg - holds value
         # self.branchtable = {}
@@ -32,27 +32,32 @@ class CPU:
     def load(self): 
         """Load a program into memory."""
         address = 0
-        filename = sys.argv[1]
+        program = sys.argv[1]
+        # program = 'ls8\examples\call.ls8'
 
         if len(sys.argv) != 2:
-            print(f'usage: file.py {filename}')
+            print(f'usage: file.py {program}')
             sys.exit(1)
     
         try: 
-            with open(filename) as f:
+            with open(program) as f:
+                count = 0
                 for line in f:
-                    # want to ignore comments
+                    count += 1
+                    # ignore comments
                     comment_split = line.split('#')
-                    # stip out whitespace
+                    # strip out whitespace
                     num = comment.split[0].strip()
                     # ignore blank lines
                     if num == '':
                         continue
-                    print(line)
 
-                    val = int(num)
-                    self.memory[address] = val
-                    # self.ram[address] = val
+                    try:
+                        val = int(num, 2)
+                    except ValyeError:
+                        continue
+
+                    self.ram[address] = val
                     address += 1
 
         except FileNotFoundError:
@@ -102,31 +107,6 @@ class CPU:
     def ram_write(MAR, MDR): 
         self.ram[MAR] = MDR
         # self.pc += 3
-
-    def stack(self, n): 
-        # starts at top address
-        # vals stored in allocated ram portion
-        # update SP
-        if n <= 1:
-            return 1
-        return n * factorial(n-1)
-
-    def pop(self):
-        reg = memory[pc + 1]
-        val = register[reg]
-        # copy val from address to memory
-        regiter[reg] = val
-        # pc += 0?
-        pc += 2
-
-    def push(self):
-        reg = memory[pc + 1]
-        val = register[reg]
-        # decrement SP
-        register[SP] = (register[SP] - 1) % (len(memory))
-        # copy val from stack
-        memory[register[SP]] = val
-        pc += 2
 
     def run(self):
         # if/elif = O(n) || O(1)
@@ -198,5 +178,30 @@ class CPU:
             else:
                 print(f'Unknown command: {command}')
                 sys.exit(1)
+    
+    
+    # def stack(self, n): 
+    #     # starts at top address
+    #     # vals stored in allocated ram portion
+    #     # update SP
+    #     if n <= 1:
+    #         return 1
+    #     return n * factorial(n-1)
 
+    # def pop(self):
+    #     reg = memory[pc + 1]
+    #     val = register[reg]
+    #     # copy val from address to memory
+    #     register[reg] = val
+    #     # pc += 0?
+    #     self.pc += 2
+
+    # def push(self):
+    #     reg = memory[pc + 1]
+    #     val = register[reg]
+    #     # decrement SP
+    #     register[self.SP] = (register[self.SP] - 1) % (len(memory))
+    #     # copy val from stack
+    #     memory[register[self.SP]] = val
+    #     pc += 2
 # self.SP is register[SP]
